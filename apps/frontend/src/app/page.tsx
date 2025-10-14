@@ -1,102 +1,128 @@
-import Image from "next/image";
+"use client"
+import { useState } from 'react';
+import { MessageCircle, Users, Shield, Zap } from 'lucide-react';
 
-export default function Home() {
+export default function WelcomePage() {
+  const [isHovered, setIsHovered] = useState<number | null>(null);
+
+  const features = [
+    {
+      icon: <MessageCircle className="w-8 h-8" />,
+      title: "Real-time Messaging",
+      description: "Instant communication with friends and colleagues"
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: "Group Chats",
+      description: "Create and manage conversations with multiple people"
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "Secure & Private",
+      description: "End-to-end encryption keeps your messages safe"
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Fast & Reliable",
+      description: "Lightning-fast message delivery you can count on"
+    }
+  ];
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="container mx-auto px-6 py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <MessageCircle className="w-8 h-8 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-800">FineChat</span>
+          </div>
+          <div className="space-x-4">
+            <a href="/login">
+              <button className="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors">
+                Sign In
+              </button>
+            </a>
+            <a href="/register">
+              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105">
+                Sign Up
+              </button>
+            </a>
+          </div>
+        </div>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
+      {/* Hero Section */}
+      <main className="container mx-auto px-6 py-20">
+        <div className="text-center max-w-4xl mx-auto mb-20">
+          <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Connect, Chat, and
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Collaborate</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Experience seamless communication with our modern chat platform. 
+            Stay connected with your team, friends, and family in real-time.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <a href="/register">
+              <button className="px-8 py-4 bg-blue-600 text-white rounded-lg text-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                Get Started Free
+              </button>
+            </a>
+            <button className="px-8 py-4 bg-white text-gray-700 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-all border-2 border-gray-200">
+              Learn More
+            </button>
+          </div>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+          {features.map((feature, idx) => (
+            <div
+              key={idx}
+              className="bg-white p-8 rounded-2xl shadow-md hover:shadow-xl transition-all transform hover:-translate-y-2 cursor-pointer"
+              onMouseEnter={() => setIsHovered(idx)}
+              onMouseLeave={() => setIsHovered(null)}
+            >
+              <div className={`text-blue-600 mb-4 transition-transform ${isHovered === idx ? 'scale-110' : 'scale-100'}`}>
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center text-white shadow-2xl">
+          <h2 className="text-4xl font-bold mb-4">Ready to start chatting?</h2>
+          <p className="text-xl mb-8 text-blue-100">
+            Join thousands of users already using our platform
+          </p>
+          <a href="/register">
+            <button className="px-10 py-4 bg-white text-blue-600 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-lg">
+              Create Your Account
+            </button>
           </a>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="container mx-auto px-6 py-8 mt-20 border-t border-gray-200">
+        <div className="flex flex-col md:flex-row justify-between items-center text-gray-600">
+          <div className="mb-4 md:mb-0">
+            <p>&copy; 2025 FineChat. All rights reserved.</p>
+          </div>
+          <div className="flex space-x-6">
+            <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
+            <a href="#" className="hover:text-blue-600 transition-colors">Terms</a>
+            <a href="#" className="hover:text-blue-600 transition-colors">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
   );
