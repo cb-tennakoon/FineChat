@@ -23,6 +23,7 @@ import {
 } from './schemas/notification.schema';
 import { Typing, TypingSchema } from './schemas/typing.schema';
 import { ArcjetModule } from '@arcjet/nest';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ArcjetModule } from '@arcjet/nest';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ChatModule,
     MongooseModule.forRoot(
       process.env.MONGODB_URI || 'mongodb://localhost:27017/chatapp',
     ),
