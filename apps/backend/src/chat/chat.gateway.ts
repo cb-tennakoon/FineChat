@@ -1,33 +1,72 @@
 import {
-  WebSocketGateway, // ← Opens WebSocket door
-  WebSocketServer, // ← Gets ALL users list
-  SubscribeMessage, // ← Listens for messages
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
   MessageBody,
-  OnGatewayDisconnect,
-  OnGatewayConnection, // ← Gets message content
+  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io'; // ← Socket.IO server
-import { Logger } from '@nestjs/common';
+import { Server, Socket } from 'socket.io';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Message, MessageDocument } from 'src/schemas/message.schema';
+
+// Define the plain message object type for emitting to clients
+interface PlainMessage {
+  _id: string;
+  username: string;
+  content: string;
+  time: string;
+  createdAt: Date;
+}
 
 @WebSocketGateway({
-  cors: { origin: 'http://localhost:3000', credentials: true }, // ← CORS FIXED!
+  cors: { origin: 'http://localhost:3000' },
 })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(ChatGateway.name);
-  server: any;
+export class ChatGateway {
+  @WebSocketServer()
+  server: Server;
 
-  // PART 1: Handle Connection/Disconnect
-  handleConnection(client: Socket) {
-    this.logger.log(`✅ Client connected: ${client.id}`);
+  constructor(
+    @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
+  ) {}
+
+  @SubscribeMessage('join')
+  async handleJoin(
+    @MessageBody() { username }: { username: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.emit('joined', { message: `Welcome ${username}!` });
+
+    // Use lean() for plain objects
+    const history = await this.messageModel
+      .find()
+      .sort({ createdAt: 1 })
+      .lean()
+      .exec();
+
+    client.emit('history', history);
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`❌ Client disconnected: ${client.id}`);
-  }
+  @SubscribeMessage('sendMessage')
+  async handleMessage(
+    @MessageBody() { username, content }: { username: string; content: string },
+  ) {
+    // Save message to database
+    const savedMessage = await this.messageModel.create({
+      username,
+      content,
+      // time auto-filled by schema
+    });
 
-  // @SubscribeMessage('message')
-  // handleMessage(@MessageBody() message: string) {
-  //   console.log('📨 BACKEND RECEIVED:', message); // ← DEBUG
-  //   this.server.emit('message', message);
-  // }
+    // Convert to plain object and cast to PlainMessage type
+    const plainMessage: PlainMessage = {
+      _id: (savedMessage._id as any).toString(),
+      username: savedMessage.username,
+      content: savedMessage.content,
+      time: savedMessage.time,
+      createdAt: (savedMessage as any).createdAt || new Date(),
+    };
+
+    this.server.emit('message', plainMessage);
+  }
 }
